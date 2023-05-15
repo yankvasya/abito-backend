@@ -29,4 +29,17 @@ const advertSchema = new mongoose.Schema({
   },
 });
 
+advertSchema.virtual("id").get(function () {
+  return this._id ? this._id.toHexString() : null;
+});
+
+advertSchema.set("toJSON", {
+  virtuals: true,
+  transform: function (doc, ret, options) {
+    delete ret._id; // удаляем _id
+    delete ret.__v;
+    return ret;
+  },
+});
+
 module.exports = mongoose.model("Advert", advertSchema);

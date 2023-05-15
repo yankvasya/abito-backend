@@ -46,6 +46,23 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  personType: {
+    type: String,
+    enum: ["individual", "corporate"],
+    required,
+  },
+});
+
+userSchema.virtual("id").get(function () {
+  return this._id ? this._id.toHexString() : null;
+});
+
+userSchema.set("toJSON", {
+  virtuals: true,
+  transform: function (doc, ret, options) {
+    delete ret._id; // удаляем _id
+    return ret;
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
