@@ -9,12 +9,14 @@ const bcrypt = require("bcrypt");
 
 const errorsHelper = require("./helpers/errors");
 const advertsHelper = require("./helpers/adverts");
+const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
+const PORT = process.env.PORT;
 
 const authenticate = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (authHeader) {
     const token = authHeader.split(" ")[1];
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+    jwt.verify(token, ACCESS_TOKEN_SECRET, (err, user) => {
       if (err) {
         return res.sendStatus(403);
       }
@@ -44,7 +46,7 @@ app.get("/", (req, res) => {
 });
 
 app.listen(3000, () => {
-  console.log(`Сервер запущен на порту 3000`);
+  console.log(`Сервер запущен на порту ${PORT}`);
 });
 
 app.use(express.json()); // for parsing application/json
@@ -87,7 +89,7 @@ app.post("/adverts", authenticate, async (req, res) => {
 
   try {
     await advert.save();
-    res.send(advert);
+    res.send("Объявление успешно создано!");
   } catch (err) {
     if (err.name === "ValidationError") {
       res.status(400).send({
@@ -116,7 +118,7 @@ app.put("/adverts/:id", async (req, res) => {
   advert.price = req.body.price;
   advert.user = req.body.user;
   await advert.save();
-  res.send(advert);
+  res.send("Объявление успешно обновлено!");
 });
 
 // Регистрация нового пользователя
@@ -124,6 +126,7 @@ app.post("/register", async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const user = new User({
+      username: req.body.username,
       email: req.body.email,
       password: hashedPassword,
       firstName: req.body.firstName,
@@ -132,7 +135,7 @@ app.post("/register", async (req, res) => {
       // reviews и rating автоматически установятся на [] и 0
     });
     await user.save();
-    res.send(user);
+    res.send("Регистрация прошла успешно");
   } catch (err) {
     res.status(500).send({
       error: {
