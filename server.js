@@ -8,11 +8,13 @@ require("dotenv").config();
 const Advert = require("./models/Advert");
 const User = require("./models/User");
 const Ads = require("./models/Ads");
+const Services = require("./models/Services");
 
 const errorsHelper = require("./helpers/errors");
 const advertsHelper = require("./helpers/adverts");
 const adsHelper = require("./helpers/ads");
 const userHelper = require("./helpers/user");
+const servicesHelper = require("./helpers/services");
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const PORT = process.env.PORT;
@@ -63,11 +65,18 @@ app.get("/adverts", async (req, res) => {
   res.send(formattedAdverts);
 });
 
+// Получение информации по рекламе
 app.get("/ads", async (req, res) => {
   const ads = await Ads.find();
   const formattedAds = ads.map(adsHelper.formatAds);
-  // const formattedAds = ads;
   res.send(formattedAds);
+});
+
+// Получение Сервисов и услуг
+app.get("/services", async (req, res) => {
+  const services = await Services.find();
+  const formattedServices = services.map(servicesHelper.formatServices);
+  res.send(formattedServices);
 });
 
 // Получение одного объявления по id
