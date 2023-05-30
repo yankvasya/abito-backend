@@ -10,6 +10,8 @@ const bcrypt = require("bcrypt");
 
 const errorsHelper = require("./helpers/errors");
 const advertsHelper = require("./helpers/adverts");
+const userHelper = require("./helpers/user");
+
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
 const PORT = process.env.PORT;
 
@@ -154,7 +156,7 @@ app.post("/register", async (req, res) => {
 app.post("/login", async (req, res) => {
   const user = await User.findOne({ username: req.body.username });
   if (user == null) {
-    return res.status(400).send("Пользователь не существует");
+    return res.status(400).send({ error: "Пользователь не существует" });
   }
   try {
     if (await bcrypt.compare(req.body.password, user.password)) {
@@ -162,12 +164,12 @@ app.post("/login", async (req, res) => {
         user.toJSON(),
         process.env.ACCESS_TOKEN_SECRET
       );
-      res.json({ accessToken: accessToken });
+      res.json({ ...userHelper.formatUser(user), accessToken: accessToken });
     } else {
-      res.status(403).send("Неверный пароль");
+      res.status(403).send({ error: "Неверный пароль" });
     }
   } catch {
-    res.status(500).send("Что-то пошло не так. Попробуйте позже");
+    res.status(500).send({ error: "Что-то пошло не так. Попробуйте позже" });
   }
 });
 
