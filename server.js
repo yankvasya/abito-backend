@@ -1,15 +1,17 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 const cors = require("cors");
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 const Advert = require("./models/Advert");
-const jwt = require("jsonwebtoken");
 const User = require("./models/User");
-const bcrypt = require("bcrypt");
+const Ads = require("./models/Ads");
 
 const errorsHelper = require("./helpers/errors");
 const advertsHelper = require("./helpers/adverts");
+const adsHelper = require("./helpers/ads");
 const userHelper = require("./helpers/user");
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET;
@@ -59,6 +61,13 @@ app.get("/adverts", async (req, res) => {
   const adverts = await Advert.find();
   const formattedAdverts = adverts.map(advertsHelper.formatAdvert);
   res.send(formattedAdverts);
+});
+
+app.get("/ads", async (req, res) => {
+  const ads = await Ads.find();
+  const formattedAds = ads.map(adsHelper.formatAds);
+  // const formattedAds = ads;
+  res.send(formattedAds);
 });
 
 // Получение одного объявления по id
